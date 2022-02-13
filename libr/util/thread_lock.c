@@ -2,6 +2,7 @@
 
 #include <r_th.h>
 #include <r_util/r_assert.h>
+#include <r_util/r_log.h>
 
 /* locks/mutex/sems */
 static bool lock_init(RThreadLock *thl, bool recursive) {
@@ -64,6 +65,7 @@ static void r_atomic_store(volatile R_ATOMIC_BOOL *data, bool v) {
 }
 
 R_API RThreadLock *r_th_lock_new(bool recursive) {
+	R_LOG_DEBUG ("r_th_lock_new");
 	RThreadLock *thl = R_NEW0 (RThreadLock);
 	if (thl) {
 		if (lock_init (thl, recursive)) {
@@ -77,16 +79,28 @@ R_API RThreadLock *r_th_lock_new(bool recursive) {
 	return thl;
 }
 
+<<<<<<< HEAD
 R_API bool r_th_lock_wait(RThreadLock *thl) {
 	r_return_val_if_fail (thl, false);
+=======
+R_API int r_th_lock_wait(RThreadLock *thl) {
+	R_LOG_DEBUG ("r_th_lock_wait");
+>>>>>>> 515568ccf (Adding more wip)
 	r_th_lock_enter (thl); // locks here
 	r_th_lock_leave (thl); // releases previous mutex
 	return true;
 }
 
 // TODO: return bool
+<<<<<<< HEAD
 R_API bool r_th_lock_enter(RThreadLock *thl) {
 	r_return_val_if_fail (thl, false);
+=======
+R_API int r_th_lock_enter(RThreadLock *thl) {
+	r_return_val_if_fail (thl, -1);
+	R_LOG_DEBUG ("r_th_lock_enter");
+
+>>>>>>> 515568ccf (Adding more wip)
 	// initialize static locks on acquisition
 	if (thl->type == R_TH_LOCK_TYPE_STATIC) {
 		while (r_atomic_exchange (&thl->activating, true)) {
@@ -109,8 +123,16 @@ R_API bool r_th_lock_enter(RThreadLock *thl) {
 #endif
 }
 
+<<<<<<< HEAD
 R_API bool r_th_lock_tryenter(RThreadLock *thl) {
 	r_return_val_if_fail (thl, false);
+=======
+R_API int r_th_lock_tryenter(RThreadLock *thl) {
+	R_LOG_DEBUG ("r_th_lock_tryenter");
+	if (!thl) {
+		return -1;
+	}
+>>>>>>> 515568ccf (Adding more wip)
 #if HAVE_PTHREAD
 	return pthread_mutex_trylock (&thl->lock) == 0;
 #elif __WINDOWS__
@@ -120,8 +142,16 @@ R_API bool r_th_lock_tryenter(RThreadLock *thl) {
 #endif
 }
 
+<<<<<<< HEAD
 R_API bool r_th_lock_leave(RThreadLock *thl) {
 	r_return_val_if_fail (thl, false);
+=======
+R_API int r_th_lock_leave(RThreadLock *thl) {
+	R_LOG_DEBUG ("r_th_lock_leave");
+	if (!thl) {
+		return -1;
+	}
+>>>>>>> 515568ccf (Adding more wip)
 #if HAVE_PTHREAD
 	return pthread_mutex_unlock (&thl->lock) == 0;
 #elif __WINDOWS__
@@ -133,6 +163,7 @@ R_API bool r_th_lock_leave(RThreadLock *thl) {
 }
 
 R_API void *r_th_lock_free(RThreadLock *thl) {
+	R_LOG_DEBUG ("r_th_lock_free");
 	if (thl) {
 #if HAVE_PTHREAD
 		pthread_mutex_destroy (&thl->lock);
